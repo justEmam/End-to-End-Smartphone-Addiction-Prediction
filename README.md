@@ -1,26 +1,12 @@
 # 📱 Smartphone Addiction Prediction — End to End ML Pipeline
 
-Predicts addiction level (`Mild`, `Moderate`, `Severe`) from smartphone usage behavior data. Built with scikit-learn, tracked with MLflow.
+Predicts addiction level (`Mild`, `Moderate`, `Severe`) from smartphone usage behavior data. Built with scikit-learn, tracked with MLflow. Backend handled with Django Django Rest Framework, Frontend with React
 
 ---
 
 ## 📁 Project Structure
 
-```
-├── data/
-│   ├── raw/                     # original dataset
-│   └── processed/               # preprocessed train/test splits
-├── notebooks/
-│   ├── preprocessing.py         # feature engineering + pipeline
-│   └── training.py              # model training + mlflow logging
-├── ml/
-│   └── preprocessor/
-│       └── preprocessor.joblib  # saved ColumnTransformer
-├── readme_assets/
-│   ├── preprocessing_pipeline.svg
-│   └── mlflow_structure.svg
-└── README.md
-```
+Still unfinished.
 
 ---
 
@@ -40,21 +26,7 @@ Features are split into three groups and handled by a `ColumnTransformer`:
 
 The pipeline is fit **only on training data** and applied to test data — no leakage.
 
-```python
-preprocessor = ColumnTransformer(transformers=[
-    ('onehot',     OneHotEncoder(handle_unknown='ignore'),                        categorical_cols),
-    ('quantile',   QuantileTransformer(output_distribution='normal', random_state=42), quantile_cols),
-    ('age_scaler', StandardScaler(),                                              ['age'])
-])
 
-X_train_processed = preprocessor.fit_transform(X_train)
-X_test_processed  = preprocessor.transform(X_test)
-```
-
-The preprocessor is saved with `joblib` for reuse at prediction time:
-```python
-joblib.dump(preprocessor, 'ml/preprocessor/preprocessor.joblib')
-```
 
 ---
 
@@ -138,34 +110,11 @@ experiment: screen_time_addiction
 
 The best child per model is identified during the loop and its metrics are **re-logged to the parent run** with a `best_` prefix. This means you can compare the three parent runs directly in the MLflow UI to pick the top 2 models for the registry.
 
-### Model Registration
 
-Models are **not auto-registered** — only logged as artifacts. To register from the MLflow UI:
-
-1. Open the experiment → find a parent run
-2. Click **Artifacts** tab → click **Register Model**
-3. Name: `screen_time_addiction_classifier`
-4. Repeat for the second best model
-5. Go to **Models** tab → assign versions to `Production` / `Staging`
-
-To load a registered model:
-```python
-model = mlflow.sklearn.load_model("models:/screen_time_addiction_classifier/latest")
-```
 
 ---
 
-## 📊 Results
 
-| Model | Best Val Accuracy | Test Accuracy |
-|---|---|---|
-| Logistic Regression | ~0.63 | ~0.63 |
-| SVM | ~0.63 | ~0.63 |
-| Random Forest | ~0.58 | ~0.58 |
-
-> Accuracy is moderate due to weak feature-to-label correlation. A dummy classifier (majority class baseline) scores ~43%, so models are learning meaningfully. Feature engineering (screen-to-sleep ratio, social-to-total ratio) may improve results further.
-
----
 
 ## ▶️ Running the Project
 
