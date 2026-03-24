@@ -6,10 +6,22 @@ Predicts addiction level (`Mild`, `Moderate`, `Severe`) from smartphone usage be
 
 ## 📁 Project Structure
 
-Still unfinished.
+```text
 
+├── backend/                  # Django project configuration (settings, wsgi, asgi)
+├── phone_addiction/          # Main Django application
+│   ├── ml/                   # Inference logic (predict.py, shap_explainer.py)
+│   ├── serializers.py        # DRF serializers for data validation & formatting
+│   ├── views.py              # API endpoint controllers
+│   └── urls.py               # App-level routing
+├── frontend/                 # React UI (Vite)
+├── ml/                       # Exported model artifacts (.pkl, .joblib)
+├── notebooks/                # ML pipeline notebooks (EDA,preprocessing, training and experimenting)
+├── .env                      # Environment variables (not tracked)
+├── manage.py                 # Django entry point
+└── requirements.txt          # Python dependencies
 ---
-
+```
 ## 🔧 Preprocessing Pipeline
 
 Features are split into three groups and handled by a `ColumnTransformer`:
@@ -54,6 +66,12 @@ Mild     (0): 1098
 Three model families were trained, each with a grid of hyperparameters tracked as **nested runs** in MLflow.
 
 ![MLflow Experiment Structure](readme_assets/mlflow_structure.svg)
+
+### Models Comparison Charts on MLFlow:
+![MLFlow Models Comparison](readme_assets/models_comparison.png)
+
+### Registered Models:
+![MLFlow Registered Models](readme_assets/registered_models.png)
 
 ### Models & Grids
 
@@ -113,20 +131,100 @@ The best child per model is identified during the loop and its metrics are **re-
 
 
 ---
+---
+
+## ⚙️ Backend API (Django + DRF)
+
+The backend serves the trained ML model via a REST API. It handles incoming JSON payloads, validates them using `serializers.py`, processes the data through the saved `ColumnTransformer`, generates predictions, and calculates feature importance for that specific user.
+
+### Core Endpoint
+
+`POST /api/predict/`
+
+Accepts a JSON payload containing the user's smartphone usage data. 
+
+**Response Profile:**
+* `prediction`: The predicted class (`Mild`, `Moderate`, `Severe`)
+* `probabilities`: Confidence scores for each class.
+* `shap_values`: An ordered list of features and their impact scores for the specific prediction.
+
+---
+
+## 📊 Model Explainability (SHAP)
+
+Machine learning shouldn't be a black box. This project uses **SHAP (SHapley Additive exPlanations)** via `TreeExplainer` to provide real-time, local interpretability for every prediction made by the Random Forest model.
+
+Instead of just returning "Severe Addiction", the API calculates the exact contribution of each feature (e.g., `screen_on_time`, `social_media_usage`) for that specific user. These values are sorted by absolute impact and sent to the frontend to be rendered dynamically.
+
+---
+
+## 💻 Frontend (React)
+
+The frontend is a responsive React application that collects user data, handles API communication, and visualizes both the prediction and the SHAP explainability data.
+
+### 📸 Screenshots
+
+
+ ![App Interface](readme_assets/homepage.png) — *Home page*
+
+![App Interface](readme_assets/basic_info.png) — *Input form for basic personal info.*
+![App Interface](readme_assets/screentime.png) — *Input form for smartphone usage metrics.*
+![App Interface](readme_assets/lifestyle.png) — *Input form for lifestyle metrics.*
+
+
+ ![Prediction & SHAP Results](readme_assets/results.png) — *Prediction results and dynamic SHAP bar chart.*
+
+---
+
+## 🚀 Running the Web Application Locally
+
+### 1. Environment Variables Setup
+
+To avoid hardcoding sensitive information in `settings.py`, create a file named `.env` in the root of the project (in the same folder as `manage.py`) and add the following lines:
+
+```env
+# .env
+DJANGO_SECRET_KEY=your-local-secret-key-string-here
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+```
 
 
 
 ## ▶️ Running the Project
 
+The project is split into the Machine Learning pipeline and the Web Application. You will need separate terminal windows to run the servers simultaneously.
+
+### 1. Run the ML Pipeline
+
+First run:
+1. Preprocess the dataset
+notebooks/02_preprocessing.ipynb
+
+ 2. Train models and log metrics to MLflow
+notebooks/03_training_and_experimenting.ipynb
+
+
+
+Execute these scripts from the root directory:
+
 ```bash
-# 1. preprocess
-python notebooks/preprocessing.py
-
-# 2. train + log to mlflow
-python notebooks/training.py
-
-# 3. launch mlflow ui
-cd <project root>
+# 0. Install Python dependencies
+pip install -r requirements.txt
+#  (Optional) Launch the MLflow UI to view experiment results
 mlflow ui
-# open http://127.0.0.1:5000
-```
+# Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser
+
+
+# Activate your virtual environment first if you haven't already
+# Start the Django development server
+python manage.py runserver
+
+
+cd frontend
+
+# Install frontend dependencies (only required the first time)
+npm install
+
+# Start the Vite development server
+npm run dev
