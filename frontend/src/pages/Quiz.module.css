@@ -1,0 +1,111 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 500px;
+  animation: fadeUp 0.5s ease both;
+}
+
+.progress {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+
+.pip {
+  flex: 1;
+  height: 3px;
+  border-radius: 100px;
+  background: var(--border);
+  transition: background 0.4s;
+}
+
+.pipActive { background: var(--accent); }
+
+.stepLabel {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+
+.title {
+  font-family: var(--font-head);
+  font-size: 1.9rem;
+  font-weight: 400;
+  margin-bottom: 0.2rem;
+}
+
+.subtitle {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.error {
+  font-size: 0.83rem;
+  color: var(--danger);
+  margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.back {
+  padding: 12px 18px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.back:hover { border-color: var(--text); color: var(--text); }
+
+.next, .submit {
+  flex: 1;
+  padding: 13px;
+  background: var(--accent);
+  color: #000;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.next:hover, .submit:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.submit:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
