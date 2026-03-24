@@ -1,0 +1,19 @@
+# Python & Django
+__pycache__/
+*.py[cod]
+*$py.class
+db.sqlite3
+
+# Environment
+.env
+phonenv/
+
+# MLflow
+mlruns/
+mlflow.db
+notebooks/mlflow.db
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+.DS_Store
